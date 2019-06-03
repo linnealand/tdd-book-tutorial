@@ -1,4 +1,6 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
 import unittest
 
 class NewVisitorTest(unittest.TestCase):
@@ -14,15 +16,29 @@ class NewVisitorTest(unittest.TestCase):
 
         # Page title and header
         self.assertIn('To-Do', self.browser.title)
-        self.fail('Finish the test!')
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('To-Do', header_text)
 
         # Enter a to-do list item
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual(
+            inputbox.get_attribute('placeholder'),
+            'Enter a to-do item'
+        )
 
         # Type into text box
+        inputbox.send_keys('Feed the cat')
 
         # Hit enter, page updates, page lists item
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertTrue(any(row.text == '1: Feed the cat' for row in rows))
 
         # There is a text box to add another item
+        self.fail('Finish the test!')
 
         # Page updates again, shows both items in list
 
